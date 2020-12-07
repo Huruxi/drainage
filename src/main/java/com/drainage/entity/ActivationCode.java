@@ -16,6 +16,9 @@ public class ActivationCode implements java.io.Serializable {
 
     private String code;
     private int status;
+    private int typeId;
+    private int loginState;
+
     private Date updateTime;
     private Date addTime;
 }

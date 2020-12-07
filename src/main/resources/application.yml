@@ -1,0 +1,46 @@
+server:
+  port: 8088
+
+spring:
+  datasource:
+    # 驱动: h2
+    driver-class-name: org.h2.Driver
+    # H2  内存数据库 库名: drainage
+#    url: jdbc:h2:mem:test
+    # H2 文件数据库
+    url: jdbc:h2:file:./db/drainage
+
+    # 初始化数据表 DDL
+    schema: classpath:db/schema-h2.sql
+    # 初始化数据 DML
+    data: classpath:db/data-h2.sql
+    username: root
+    password: test
+    platform: h2
+  h2:
+    console:
+      enabled: true #进行该配置，程序开启时就会启动h2 web consloe
+      settings:
+        web-allow-others: true # 进行该配置后，h2 web consloe就可以在远程访问了。否则只能在本机访问。
+      path: /h2   #进行该配置，你就可以通过YOUR_URL/h2访问h2 web consloe。YOUR_URL是你程序的访问URl。
+
+  jpa:
+    show-sql: true  #启用SQL语句的日志记录
+    hibernate:
+      ddl-auto: update
+
+# 日志
+logging:
+  level:
+    com.drainage: debug
+
+# mybatis-plus
+mybatis-plus:
+  mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      table-prefix: t_
+      id-type: auto
+      field-strategy: ignored

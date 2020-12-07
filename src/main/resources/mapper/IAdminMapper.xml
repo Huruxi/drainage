@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.drainage.mapper.IAdminMapper">
+
+    <insert id="insertAdmin">
+        insert into t_admin(name,password,update_time,add_time) values(#{name},#{password},now(),now())
+    </insert>
+    
+    <select id="findAdmins" resultType="com.drainage.entity.Admin">
+        select id,name,password,update_time as updateTime,add_time as addTime from t_admin
+    </select>
+</mapper>

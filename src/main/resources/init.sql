@@ -37,7 +37,7 @@ CREATE TABLE `t_activation_code_type` (
 CREATE TABLE `t_activation_code_login_log` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL COMMENT '类型名称',
-  `online_time` int(4) DEFAULT 0 COMMENT '在线时间',
+  `online_time` int(4) DEFAULT 0 COMMENT '在线时间,以秒为单位',
   `ip` varchar(255) DEFAULT NULL COMMENT '登录IP',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
@@ -62,6 +62,17 @@ CREATE TABLE `t_placard` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL COMMENT '标题',
   `content` varchar(1000) DEFAULT NULL COMMENT '公告内容',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `add_time` datetime DEFAULT NULL COMMENT '添加时间',
+  PRIMARY KEY (`id`)
+);
+
+
+-- 商户信息
+CREATE TABLE `t_merchant_info` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL COMMENT '名称',
+  `content` varchar(1000) DEFAULT NULL COMMENT '内容',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`)

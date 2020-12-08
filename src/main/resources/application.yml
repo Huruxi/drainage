@@ -44,3 +44,8 @@ mybatis-plus:
       table-prefix: t_
       id-type: auto
       field-strategy: ignored
+
+
+login:
+  duration: 240  # 登录时长，最多240分钟
+  quantity: 20 # 每台机器的登录数量

@@ -22,6 +22,8 @@ public class ActivationCodeLoginLog implements java.io.Serializable {
      */
     private int onlineTime;
 
+    private int loginState;
+
     /**
      * 登录IP
      */

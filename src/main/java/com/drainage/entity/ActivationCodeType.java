@@ -2,6 +2,7 @@ package com.drainage.entity;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -15,6 +16,8 @@ public class ActivationCodeType implements java.io.Serializable {
     private int id;
 
     private String name;
+
+    private BigDecimal money;
 
     private Date updateTime;
     private Date addTime;

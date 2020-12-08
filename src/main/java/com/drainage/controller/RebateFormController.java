@@ -1,5 +1,6 @@
 package com.drainage.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.drainage.dto.CodeEnum;
 import com.drainage.dto.HttpResult;
 import com.drainage.entity.ActivationCode;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,35 +39,27 @@ public class RebateFormController {
     private IActiveCodeService activeCodeService;
 
 
-    @ApiOperation("添加返利记录")
+    @ApiOperation("检索激活码返利记录")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "money", required = true, value = "返利金额", dataType = "BigDecimal", paramType = "query")
+            @ApiImplicitParam(name = "sortType", required = true, value = "根据Id排序方式,0 正序 1 倒序", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "offset", required = true, value = "数据偏移量", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", required = true, value = "限制获取数据大小", dataType = "int", paramType = "query")
     })
-    @RequestMapping(value = "/addRebateForm",method = RequestMethod.POST)
-    public HttpResult<RebateForm> addRebateForm(@RequestParam String code,
-                                                       @RequestParam BigDecimal money){
+    @RequestMapping(value = "/searchRebateForm",method = RequestMethod.POST)
+    public HttpResult<List<RebateForm>> searchRebateForm(@RequestParam String code,
+                                                         @RequestParam int sortType,
+                                                         @RequestParam int offset,
+                                                         @RequestParam int limit){
 
         ActivationCode activationCode = activeCodeService.findActivationCode(code);
         if(activationCode == null){
             return new HttpResult<>().fillCode(CodeEnum.ERROR_PARAMETER);
         }
 
-        if(activationCode.getStatus() == 0){
-            activationCode.setStatus(1);
-            activeCodeService.updateActiveCode(activationCode);
-        }
-
-        RebateForm rebateForm = new RebateForm();
-        rebateForm.setCode(code);
-        rebateForm.setMoney(money);
-        rebateForm.setUpdateTime(new Date());
-        rebateForm.setAddTime(new Date());
-        rebateFormService.addRebateForm(rebateForm);
-        return new HttpResult<>().fillData(rebateForm);
+        IPage rebateForms = rebateFormService.findActiveCodeRebateForm(code,sortType, offset, limit);
+        return new HttpResult<>().fillData(rebateForms);
     }
-
-
 
     @ApiOperation("获取返利记录")
     @ApiImplicitParams({
@@ -77,11 +68,11 @@ public class RebateFormController {
             @ApiImplicitParam(name = "limit", required = true, value = "限制获取数据大小", dataType = "int", paramType = "query")
     })
     @RequestMapping(value = "/findRebateForm",method = RequestMethod.POST)
-    public HttpResult<List<RebateForm>> findRebateForm(@RequestParam int sortType,
+    public HttpResult<IPage> findRebateForm(@RequestParam int sortType,
                                                        @RequestParam int offset,
                                                        @RequestParam int limit){
 
-        List<RebateForm> rebateForms = rebateFormService.findRebateForm(sortType, offset, limit);
+        IPage rebateForms = rebateFormService.findRebateForm(sortType, offset, limit);
         return new HttpResult<>().fillData(rebateForms);
     }
 

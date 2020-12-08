@@ -2,6 +2,7 @@ package com.drainage.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.drainage.entity.ActivationCode;
+import com.drainage.entity.ActivationCodeLoginLog;
 
 import java.util.List;
 
@@ -47,6 +48,12 @@ public interface IActiveCodeService {
     ActivationCode findActivationCode(String code);
 
     /**
+     * 获取登录激活码
+     * @return
+     */
+    List<ActivationCode> findLoginActivationCode();
+
+    /**
      * 批量获取激活码
      * @param sortType
      * @param offset
@@ -55,4 +62,25 @@ public interface IActiveCodeService {
      */
     IPage batchFindActiveCode(int sortType, int offset, int limit);
 
+
+    /**
+     * 添加登录日志
+     * @param codeLoginLog
+     * @return
+     */
+    int addActivationCodeLoginLog(ActivationCodeLoginLog codeLoginLog);
+
+    /**
+     * 更新激活码登录时长
+     * @param code
+     * @return
+     */
+    int updateActiveCodeOnlineTime(String code);
+
+    /**
+     * 当前IP激活码登录数量
+     * @param ip
+     * @return
+     */
+    int currentIpActiveCodeLoginQuantity(String ip);
 }

@@ -4,13 +4,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.drainage.dto.CodeEnum;
 import com.drainage.dto.HttpResult;
 import com.drainage.entity.ActivationCode;
+import com.drainage.entity.ActivationCodeLoginLog;
 import com.drainage.service.IActiveCodeService;
 import com.drainage.utils.ActivationCodeGenerator;
+import com.drainage.utils.IpUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author hrd <br/>
@@ -34,6 +36,9 @@ public class ActivationCodeController {
 
     @Autowired
     private IActiveCodeService activeCodeService;
+
+    @Value("login.quantity")
+    private int loginQuantity;
 
 
     @ApiOperation("生成激活码")
@@ -94,4 +99,62 @@ public class ActivationCodeController {
         activeCodeService.delActiveCode(id);
         return new HttpResult().fillCode(CodeEnum.SUCCESS);
     }
+
+    @ApiOperation("激活码登录")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+    })
+    @RequestMapping(value = "/activeCodeLogin",method = RequestMethod.POST)
+    public HttpResult activeCodeLogin(@RequestParam String code){
+        ActivationCode activationCode = activeCodeService.findActivationCode(code);
+        if(activationCode == null){
+            return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
+        }
+
+        String ipAddress = IpUtil.getIpAddrByRequest(request);
+        if(ipAddress == null){
+            return new HttpResult().fillCode(500,"异常登录");
+        }else{
+            int codeLoginQuantity = activeCodeService.currentIpActiveCodeLoginQuantity(ipAddress);
+            if(codeLoginQuantity >= loginQuantity){
+                return new HttpResult().fillCode(500,"当前登录机器不能超过" + loginQuantity + "个激活码");
+            }
+        }
+
+        activationCode.setStatus(1);
+        activationCode.setLoginState(1);
+        activationCode.setUpdateTime(new Date());
+        int result = activeCodeService.updateActiveCode(activationCode);
+        if(result == 1){
+            ActivationCodeLoginLog codeLoginLog = new ActivationCodeLoginLog();
+            codeLoginLog.setCode(activationCode.getCode());
+            codeLoginLog.setIp(ipAddress);
+            codeLoginLog.setUpdateTime(new Date());
+            codeLoginLog.setAddTime(new Date());
+            activeCodeService.addActivationCodeLoginLog(codeLoginLog);
+            return new HttpResult().fillCode(CodeEnum.SUCCESS);
+        }
+        return new HttpResult().fillCode(CodeEnum.ERROR_SERVER);
+    }
+
+    @ApiOperation("激活码退出登录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+    })
+    @RequestMapping(value = "/activeCodeQuit",method = RequestMethod.POST)
+    public HttpResult activeCodeQuit(@RequestParam String code){
+        ActivationCode activationCode = activeCodeService.findActivationCode(code);
+        if(activationCode == null){
+            return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
+        }
+
+        activationCode.setLoginState(0);
+        activationCode.setUpdateTime(new Date());
+        activeCodeService.updateActiveCode(activationCode);
+        activeCodeService.updateActiveCodeOnlineTime(code);
+        return new HttpResult().fillCode(CodeEnum.SUCCESS);
+    }
+
+
+
 }

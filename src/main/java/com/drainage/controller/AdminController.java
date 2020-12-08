@@ -37,17 +37,17 @@ public class AdminController {
             @ApiImplicitParam(name = "name", required = true, value = "管理员名称", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "passwrod", required = true, value = "登录密码", dataType = "String", paramType = "query")
     })
-    @RequestMapping(value = "/0/loginUser",method = RequestMethod.POST)
+    @RequestMapping(value = "/0/loginUser", method = RequestMethod.POST)
     public HttpResult loginUser(@RequestParam String name,
-                                @RequestParam String passwrod){
+                                @RequestParam String passwrod) {
 
         Admin admin = adminService.findAdmin(name);
-        if(admin == null){
+        if (admin == null) {
             return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
         }
 
-        if(passwrod.equals(admin.getPassword())){
-            request.getSession().setAttribute(GlobalConst.USER_SESSION_KEY,admin);
+        if (passwrod.equals(admin.getPassword())) {
+            request.getSession().setAttribute(GlobalConst.USER_SESSION_KEY, admin);
             System.out.println(request.getSession().getId());
             return new HttpResult().fillCode(CodeEnum.SUCCESS);
         }
@@ -57,26 +57,27 @@ public class AdminController {
 
 
     @ApiOperation("退出登录")
-    @RequestMapping(value = "/outLogin",method = RequestMethod.POST)
-    public HttpResult outLogin(){
+    @RequestMapping(value = "/outLogin", method = RequestMethod.POST)
+    public HttpResult outLogin() {
         request.getSession().removeAttribute(GlobalConst.USER_SESSION_KEY);
         return new HttpResult().fillCode(CodeEnum.SUCCESS);
     }
 
 
     @ApiOperation("添加管理员")
-    @RequestMapping(value = "/addAdmin",method = RequestMethod.POST)
+    @RequestMapping(value = "/addAdmin", method = RequestMethod.POST)
     public HttpResult addAdmin(@RequestParam String name,
-                               @RequestParam String passwrod){
+                               @RequestParam String passwrod) {
 
         Admin admin = new Admin();
         admin.setName(name);
         admin.setPassword(passwrod);
         int result = adminService.addAdmin(admin);
-        if(result == 1){
+        if (result == 1) {
             return new HttpResult().fillCode(CodeEnum.SUCCESS);
         }
 
         return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
     }
+
 }

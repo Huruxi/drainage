@@ -38,6 +38,7 @@ CREATE TABLE `t_activation_code_login_log` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL COMMENT '类型名称',
   `online_time` int(4) DEFAULT 0 COMMENT '在线时间,以秒为单位',
+  `login_state` int(4) DEFAULT 0 COMMENT '激活登录状态',
   `ip` varchar(255) DEFAULT NULL COMMENT '登录IP',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',

@@ -11,9 +11,9 @@ spring:
     url: jdbc:h2:file:./db/drainage
 
     # 初始化数据表 DDL
-    schema: classpath:db/schema-h2.sql
+#    schema: classpath:db/schema-h2.sql
     # 初始化数据 DML
-    data: classpath:db/data-h2.sql
+#    data: classpath:db/data-h2.sql
     username: root
     password: test
     platform: h2

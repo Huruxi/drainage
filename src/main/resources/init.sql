@@ -63,6 +63,7 @@ CREATE TABLE `t_placard` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL COMMENT '标题',
   `content` varchar(1000) DEFAULT NULL COMMENT '公告内容',
+  `is_release` int default 0 COMMENT '是否发布公告',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`)
@@ -73,7 +74,7 @@ CREATE TABLE `t_placard` (
 CREATE TABLE `t_merchant_info` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL COMMENT '名称',
-  `content` varchar(1000) DEFAULT NULL COMMENT '内容',
+  `content` varchar(255) DEFAULT NULL COMMENT '内容',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`)

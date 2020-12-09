@@ -17,9 +17,8 @@ public class Placard implements java.io.Serializable {
     private String title;
     private String content;
 
+    private int isRelease;
     private Date addTime;
     private Date updateTime;
-
-
 
 }

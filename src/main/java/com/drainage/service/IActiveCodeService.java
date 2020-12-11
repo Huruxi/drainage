@@ -3,6 +3,7 @@ package com.drainage.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.drainage.entity.ActivationCode;
 import com.drainage.entity.ActivationCodeLoginLog;
+import com.drainage.entity.ActivationCodeType;
 
 import java.util.List;
 
@@ -11,6 +12,12 @@ import java.util.List;
  * @date 2020/12/3
  */
 public interface IActiveCodeService {
+
+    /**
+     * 获取激活码类型
+     * @return
+     */
+    List<ActivationCodeType> findActivationCodeType();
 
     /**
      * 添加激活码

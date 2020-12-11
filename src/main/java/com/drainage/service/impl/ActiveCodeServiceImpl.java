@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.drainage.entity.ActivationCode;
 import com.drainage.entity.ActivationCodeLoginLog;
+import com.drainage.entity.ActivationCodeType;
 import com.drainage.mapper.IActivationCodeLoginLogMapper;
 import com.drainage.mapper.IActivationCodeMapper;
+import com.drainage.mapper.IActivationCodeTypeMapper;
 import com.drainage.service.IActiveCodeService;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,14 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
 
     @Autowired
     private IActivationCodeLoginLogMapper codeLoginLogMapper;
+
+    @Autowired
+    private IActivationCodeTypeMapper codeTypeMapper;
+
+    @Override
+    public List<ActivationCodeType> findActivationCodeType() {
+        return codeTypeMapper.selectList(null);
+    }
 
     @Override
     public int addActiveCode(ActivationCode activeCode) {

@@ -5,6 +5,7 @@ import com.drainage.dto.CodeEnum;
 import com.drainage.dto.HttpResult;
 import com.drainage.entity.ActivationCode;
 import com.drainage.entity.ActivationCodeLoginLog;
+import com.drainage.entity.ActivationCodeType;
 import com.drainage.service.IActiveCodeService;
 import com.drainage.utils.ActivationCodeGenerator;
 import com.drainage.utils.IpUtil;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author hrd <br/>
@@ -40,12 +42,23 @@ public class ActivationCodeController {
     @Value("login.quantity")
     private int loginQuantity;
 
+    @ApiOperation("获取激活码类型")
+    @RequestMapping(value = "/findActivationCodeTypes",method = RequestMethod.POST)
+    public HttpResult<ActivationCodeType> findActivationCodeTypes(){
+        List<ActivationCodeType> activationCodeType = activeCodeService.findActivationCodeType();
+        return new HttpResult<>().fillData(activationCodeType);
+    }
+
 
     @ApiOperation("生成激活码")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "typeId", required = true, value = "分类ID", dataType = "int", paramType = "query"),
+    })
     @RequestMapping(value = "/createActiveCode",method = RequestMethod.POST)
-    public HttpResult<ActivationCode> createActiveCode(){
+    public HttpResult<ActivationCode> createActiveCode(@RequestParam int typeId){
         ActivationCode activationCode = new ActivationCode();
         activationCode.setStatus(0);
+        activationCode.setTypeId(typeId);
         activationCode.setUpdateTime(new Date());
         activationCode.setAddTime(new Date());
 

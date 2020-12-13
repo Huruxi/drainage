@@ -12,7 +12,7 @@ CREATE TABLE `t_admin` (
 
 -- 激活码表
 CREATE TABLE `t_activation_code` (
-  `id` int(4) NOT NULL AUTO_INCREMENT,-
+  `id` int(4) NOT NULL AUTO_INCREMENT,
   `code` varchar(255) DEFAULT NULL COMMENT '激活码',
   `status` int(4) DEFAULT 0 COMMENT '是否激活, 0 未激活，1 激活',
   `type_id` int(4) default 0 comment '激活码类型ID',
@@ -27,6 +27,7 @@ CREATE TABLE `t_activation_code` (
 CREATE TABLE `t_activation_code_type` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL COMMENT '类型名称',
+  `money` DECIMAL(9,2) DEFAULT NULL COMMENT '每天返利金额',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`)
@@ -79,3 +80,8 @@ CREATE TABLE `t_merchant_info` (
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`)
 );
+
+
+ALTER TABLE t_activation_code_type
+ADD COLUMN money DECIMAL(9,2)
+DEFAULT NULL COMMENT '每天返利金额' AFTER update_time;

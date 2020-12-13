@@ -42,6 +42,11 @@ public interface IRebateFormService {
      */
     void loginRebate();
 
-
+    /**
+     * 获取激活码每日返利收入
+     * @param code
+     * @return
+     */
+    IPage findDailyActiveCodeRebateIncome(String code,int offset, int limit);
 
 }

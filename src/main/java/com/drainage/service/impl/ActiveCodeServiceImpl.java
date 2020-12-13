@@ -10,7 +10,6 @@ import com.drainage.mapper.IActivationCodeLoginLogMapper;
 import com.drainage.mapper.IActivationCodeMapper;
 import com.drainage.mapper.IActivationCodeTypeMapper;
 import com.drainage.service.IActiveCodeService;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,7 +77,6 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
     public List<ActivationCode> findLoginActivationCode() {
         QueryWrapper queryWrapper = new QueryWrapper();
         queryWrapper.eq("login_state",1);
-
         return activationCodeMapper.selectList(queryWrapper);
     }
 
@@ -125,6 +123,16 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
         queryWrapper.eq("login_state",1);
         Integer count = codeLoginLogMapper.selectCount(queryWrapper);
         return count == null ? 0 : count;
+    }
 
+    @Override
+    public IPage findDailyActiveCodeIncome(int offset, int limit){
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("type_id, to_char(add_time, 'yyyy-mm-dd') AS add_time, sum(1) AS num");
+        queryWrapper.eq("status",1);
+        queryWrapper.groupBy("type_id,to_char(add_time,'yyyy-mm-dd')");
+        queryWrapper.orderByDesc("add_time");
+        Page<ActivationCode> page = new Page<>(offset,limit);
+        return activationCodeMapper.selectPage(page, queryWrapper);
     }
 }

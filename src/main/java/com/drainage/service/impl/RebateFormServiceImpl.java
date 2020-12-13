@@ -11,6 +11,7 @@ import com.drainage.mapper.IActivationCodeTypeMapper;
 import com.drainage.mapper.IRebateFormMapper;
 import com.drainage.service.IActiveCodeService;
 import com.drainage.service.IRebateFormService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,8 +37,8 @@ public class RebateFormServiceImpl implements IRebateFormService {
     @Autowired
     private IActivationCodeTypeMapper codeTypeMapper;
 
-    @Value("login.duration")
-    private int duration;
+//    @Value("login.duration")
+    private int duration = 240;
 
     @Override
     public int addRebateForm(RebateForm rebateForm) {
@@ -105,7 +106,7 @@ public class RebateFormServiceImpl implements IRebateFormService {
                     BigDecimal rebateMoney = BigDecimal.ZERO;
 
                     if(toDayCodeRebateForm != null && toDayCodeRebateForm.size() > 0){//已有返利的情况
-                        if(toDayCodeRebateForm.size() > duration) {
+                        if(toDayCodeRebateForm.size() >= duration) {
                             //激活码退出登录
                             activationCode.setLoginState(0);
                             activationCode.setUpdateTime(new Date());
@@ -118,6 +119,7 @@ public class RebateFormServiceImpl implements IRebateFormService {
                         BigDecimal balance = codeType.getMoney().subtract(amountReturned);
                         rebate.remainMoney = balance;
                         rebate.remainSize = (duration - toDayCodeRebateForm.size());
+                        rebateMoney = getRandomMoney(rebate);
 
                     }else{//今日首次返利
                         rebate.remainMoney = codeType.getMoney();
@@ -136,6 +138,19 @@ public class RebateFormServiceImpl implements IRebateFormService {
 
             }
         }
+    }
+
+    @Override
+    public IPage findDailyActiveCodeRebateIncome(String code,int offset, int limit) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("code, to_char(add_time,'yyyy-mm-dd') as add_time,sum(money) as money");
+        if(StringUtils.isNotBlank(code)){
+            queryWrapper.eq("code",code);
+        }
+        queryWrapper.groupBy("code,to_char(add_time,'yyyy-mm-dd')");
+        queryWrapper.orderByDesc("add_time");
+        Page<RebateForm> page = new Page<>(offset,limit);
+        return rebateFormMapper.selectPage(page, queryWrapper);
     }
 
 

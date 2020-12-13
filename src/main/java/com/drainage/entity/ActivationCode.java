@@ -1,5 +1,6 @@
 package com.drainage.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.util.Date;
@@ -21,4 +22,7 @@ public class ActivationCode implements java.io.Serializable {
 
     private Date updateTime;
     private Date addTime;
+
+    @TableField(exist = false)
+    private int num;
 }

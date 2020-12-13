@@ -29,21 +29,23 @@ public class MerchantInfoServiceImpl implements IMerchantInfoService {
 
 
     @Override
-    public int addPlacard(String title, String content) {
+    public int addPlacard(String title, String content,int isRelease) {
         Placard placard = new Placard();
         placard.setTitle(title);
         placard.setContent(content);
+        placard.setIsRelease(isRelease);
         placard.setAddTime(new Date());
         placard.setUpdateTime(new Date());
         return placardMapper.insert(placard);
     }
 
     @Override
-    public int updatePlacard(int id, String title, String content) {
+    public int updatePlacard(int id, String title, String content,int isRelease) {
         Placard placard = placardMapper.selectById(id);
         if(placard != null){
             placard.setTitle(title);
             placard.setContent(content);
+            placard.setIsRelease(isRelease);
             placard.setUpdateTime(new Date());
             return placardMapper.updateById(placard);
         }
@@ -74,6 +76,14 @@ public class MerchantInfoServiceImpl implements IMerchantInfoService {
     }
 
     @Override
+    public Placard findPlacard() {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.orderByAsc("id");
+        queryWrapper.last("limit 1");
+        return placardMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     public int addMerchantInfo(String name, String val) {
         MerchantInfo merchantInfo = new MerchantInfo();
         merchantInfo.setName(name);
@@ -84,7 +94,22 @@ public class MerchantInfoServiceImpl implements IMerchantInfoService {
     }
 
     @Override
-    public List<MerchantInfo> findMerchantInfo() {
-        return merchantInfoMapper.selectList(null);
+    public int updateMerchantInfo(int id,String name, String val){
+        MerchantInfo merchantInfo = merchantInfoMapper.selectById(id);
+        if(merchantInfo != null){
+            merchantInfo.setName(name);
+            merchantInfo.setContent(val);
+            merchantInfo.setUpdateTime(new Date());
+            return merchantInfoMapper.updateById(merchantInfo);
+        }
+        return 0;
+    }
+
+    @Override
+    public MerchantInfo findMerchantInfo() {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.orderByAsc("id");
+        queryWrapper.last("limit 1");
+        return merchantInfoMapper.selectOne(queryWrapper);
     }
 }

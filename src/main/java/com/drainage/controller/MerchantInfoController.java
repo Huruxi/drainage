@@ -37,13 +37,16 @@ public class MerchantInfoController {
 
     @ApiOperation("添加公告")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "isRelease", required = true, value = "是否发布", dataType = "boolean", paramType = "query"),
             @ApiImplicitParam(name = "title", required = true, value = "公告标题", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "content", required = true, value = "公告内容", dataType = "String", paramType = "query")
     })
     @RequestMapping(value = "/addPlacard",method = RequestMethod.POST)
-    public HttpResult addPlacard(@RequestParam String title,
-                           @RequestParam String content){
-        int result = merchantInfoService.addPlacard(title, content);
+    public HttpResult addPlacard(@RequestParam boolean isRelease,
+                                 @RequestParam String title,
+                                 @RequestParam String content){
+        int releaseStatus = isRelease ? 1 : 0;
+        int result = merchantInfoService.addPlacard(title, content,releaseStatus);
         if(result > 0){
             return new HttpResult().fillCode(CodeEnum.SUCCESS);
         }
@@ -54,15 +57,23 @@ public class MerchantInfoController {
     @ApiOperation("更新公告")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", required = true, value = "公告ID", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "isRelease", required = true, value = "是否发布", dataType = "boolean", paramType = "query"),
             @ApiImplicitParam(name = "title", required = true, value = "公告标题", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "content", required = true, value = "公告内容", dataType = "String", paramType = "query")
     })
     @RequestMapping(value = "/updatePlacard",method = RequestMethod.POST)
     public HttpResult updatePlacard(@RequestParam int id,
+                                    @RequestParam boolean isRelease,
                                     @RequestParam String title,
                                     @RequestParam String content){
+        int releaseStatus = isRelease ? 1 : 0;
+        int result = 0;
+        if(id > 0){
+            result = merchantInfoService.updatePlacard(id,title, content,releaseStatus);
+        }else{
+            result = merchantInfoService.addPlacard(title, content,releaseStatus);
+        }
 
-        int result = merchantInfoService.updatePlacard(id,title, content);
         if(result > 0){
             return new HttpResult().fillCode(CodeEnum.SUCCESS);
         }
@@ -85,11 +96,25 @@ public class MerchantInfoController {
     }
 
     @ApiOperation("获取最新发布公告")
-    @RequestMapping(value = "/findNewReleasePlacard",method = RequestMethod.POST)
+    @RequestMapping(value = "/0/findNewReleasePlacard",method = RequestMethod.POST)
     public HttpResult<Placard> findNewReleasePlacard(){
-
         Placard placard = merchantInfoService.findNewReleasePlacard();
-        return new HttpResult().fillData(placard);
+        if(placard != null) {
+            return new HttpResult().fillData(placard);
+        }else{
+            return new HttpResult<>().fillCode(404,"没有发布的公告信息");
+        }
+    }
+
+    @ApiOperation("获取最新公告信息")
+    @RequestMapping(value = "/findNewPlacard",method = RequestMethod.POST)
+    public HttpResult<Placard> findNewPlacard(){
+        Placard placard = merchantInfoService.findPlacard();
+        if(placard != null) {
+            return new HttpResult().fillData(placard);
+        }else{
+            return new HttpResult<>().fillCode(404,"没有公告信息");
+        }
     }
 
 
@@ -109,10 +134,34 @@ public class MerchantInfoController {
         return new HttpResult().fillCode(CodeEnum.ERROR_SERVER);
     }
 
+
+    @ApiOperation("更新商户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", required = true, value = "id", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "name", required = true, value = "信息名称", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "val", required = true, value = "值", dataType = "String", paramType = "query")
+    })
+    @RequestMapping(value = "/updateMerchantInfo",method = RequestMethod.POST)
+    public HttpResult updateMerchantInfo(@RequestParam int id,
+                                         @RequestParam String name,
+                                         @RequestParam String val){
+        int result = 0;
+        if(id > 0){
+            result = merchantInfoService.updateMerchantInfo(id, name, val);
+        }else{
+            result = merchantInfoService.addMerchantInfo(name, val);
+        }
+
+        if(result > 0){
+            return new HttpResult().fillCode(CodeEnum.SUCCESS);
+        }
+        return new HttpResult().fillCode(CodeEnum.ERROR_SERVER);
+    }
+
     @ApiOperation("获取商户信息")
-    @RequestMapping(value = "/findMerchantInfo",method = RequestMethod.POST)
-    public HttpResult<List<MerchantInfo>> findMerchantInfo(){
-        List<MerchantInfo> merchantInfo = merchantInfoService.findMerchantInfo();
+    @RequestMapping(value = "/0/findMerchantInfo",method = RequestMethod.POST)
+    public HttpResult<MerchantInfo> findMerchantInfo(){
+        MerchantInfo merchantInfo = merchantInfoService.findMerchantInfo();
         return new HttpResult().fillData(merchantInfo);
     }
 

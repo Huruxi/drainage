@@ -46,7 +46,7 @@ public class RebateFormController {
             @ApiImplicitParam(name = "pageIndex", required = true, value = "页码", dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "pageSize", required = true, value = "页面数据大小", dataType = "int", paramType = "query")
     })
-    @RequestMapping(value = "/searchRebateForm",method = RequestMethod.POST)
+    @RequestMapping(value = "/0/searchRebateForm",method = RequestMethod.POST)
     public HttpResult<List<RebateForm>> searchRebateForm(@RequestParam String code,
                                                          @RequestParam int sortType,
                                                          @RequestParam int pageIndex,

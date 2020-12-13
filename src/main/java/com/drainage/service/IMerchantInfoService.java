@@ -18,7 +18,7 @@ public interface IMerchantInfoService {
      * @param content
      * @return
      */
-    int addPlacard(String title, String content);
+    int addPlacard(String title, String content,int isRelease);
 
     /**
      * 更新公告
@@ -27,7 +27,7 @@ public interface IMerchantInfoService {
      * @param content
      * @return
      */
-    int updatePlacard(int id,String title, String content);
+    int updatePlacard(int id,String title, String content,int isRelease);
 
     /**
      * 获取公告
@@ -45,6 +45,12 @@ public interface IMerchantInfoService {
     Placard findNewReleasePlacard();
 
     /**
+     * 获取公告
+     * @return
+     */
+    Placard findPlacard();
+
+    /**
      * 添加商户信息
      * @param name
      * @param val
@@ -53,8 +59,17 @@ public interface IMerchantInfoService {
     int addMerchantInfo(String name,String val);
 
     /**
+     * 更新商户信息
+     * @param id
+     * @param name
+     * @param val
+     * @return
+     */
+    int updateMerchantInfo(int id,String name, String val);
+
+    /**
      * 获取商户信息
      * @return
      */
-    List<MerchantInfo> findMerchantInfo();
+    MerchantInfo findMerchantInfo();
 }

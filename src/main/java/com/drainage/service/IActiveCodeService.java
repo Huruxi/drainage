@@ -90,4 +90,12 @@ public interface IActiveCodeService {
      * @return
      */
     int currentIpActiveCodeLoginQuantity(String ip);
+
+    /**
+     * 获取激活码激活返利
+     * @param offset
+     * @param limit
+     * @return
+     */
+    IPage findDailyActiveCodeIncome(int offset, int limit);
 }

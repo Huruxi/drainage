@@ -39,8 +39,8 @@ public class ActivationCodeController {
     @Autowired
     private IActiveCodeService activeCodeService;
 
-    @Value("login.quantity")
-    private int loginQuantity;
+//    @Value("login.quantity")
+    private int loginQuantity = 20;
 
     @ApiOperation("获取激活码类型")
     @RequestMapping(value = "/findActivationCodeTypes",method = RequestMethod.POST)
@@ -117,7 +117,7 @@ public class ActivationCodeController {
     @ApiImplicitParams({
         @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
     })
-    @RequestMapping(value = "/activeCodeLogin",method = RequestMethod.POST)
+    @RequestMapping(value = "/0/activeCodeLogin",method = RequestMethod.POST)
     public HttpResult activeCodeLogin(@RequestParam String code){
         ActivationCode activationCode = activeCodeService.findActivationCode(code);
         if(activationCode == null){
@@ -154,7 +154,7 @@ public class ActivationCodeController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
     })
-    @RequestMapping(value = "/activeCodeQuit",method = RequestMethod.POST)
+    @RequestMapping(value = "/0/activeCodeQuit",method = RequestMethod.POST)
     public HttpResult activeCodeQuit(@RequestParam String code){
         ActivationCode activationCode = activeCodeService.findActivationCode(code);
         if(activationCode == null){

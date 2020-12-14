@@ -3,8 +3,6 @@ package com.drainage.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.drainage.entity.RebateForm;
 
-import java.util.List;
-
 /**
  * @author hrd <br/>
  * @date 2020/12/3
@@ -49,4 +47,14 @@ public interface IRebateFormService {
      */
     IPage findDailyActiveCodeRebateIncome(String code,int offset, int limit);
 
+    /**
+     * 统计激活码返利
+     * @param code
+     * @param startTime
+     * @param endTime
+     * @param offset
+     * @param limit
+     * @return
+     */
+    IPage statisticsActiveCodeRebate(String code,String startTime,String endTime,int offset, int limit);
 }

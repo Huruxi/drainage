@@ -20,10 +20,10 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Admin admin = (Admin)request.getSession().getAttribute(GlobalConst.USER_SESSION_KEY);
-        if(admin == null){
-            response.sendRedirect("/login");
-            return false;
-        }
+//        if(admin == null){
+//            response.sendRedirect("/login");
+//            return false;
+//        }
 
         return true;
     }

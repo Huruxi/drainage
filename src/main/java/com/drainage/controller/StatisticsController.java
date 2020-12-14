@@ -63,4 +63,22 @@ public class StatisticsController {
         return new HttpResult().fillData(rebateIncome);
     }
 
+
+    @ApiOperation("统计激活码返利")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startTime", required = true, value = "开始时间", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endTime", required = true, value = "结束时间", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "pageIndex", required = true, value = "页码", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "pageSize", required = true, value = "页面数据大小", dataType = "int", paramType = "query")
+    })
+    @RequestMapping(value = "/statisticsActiveCodeRebate",method = RequestMethod.POST)
+    public HttpResult<IPage> statisticsActiveCodeRebate(@RequestParam String code,
+                                                        @RequestParam String startTime,
+                                                        @RequestParam String endTime,
+                                                        @RequestParam int pageIndex,
+                                                        @RequestParam int pageSize){
+        IPage page = rebateFormService.statisticsActiveCodeRebate(code, startTime, endTime, pageIndex, pageSize);
+        return new HttpResult().fillData(page);
+    }
 }

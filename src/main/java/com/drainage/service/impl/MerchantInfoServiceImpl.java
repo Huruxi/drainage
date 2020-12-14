@@ -3,11 +3,14 @@ package com.drainage.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.drainage.entity.MerchantAccount;
 import com.drainage.entity.MerchantInfo;
 import com.drainage.entity.Placard;
+import com.drainage.mapper.IMerchantAccountMapper;
 import com.drainage.mapper.IMerchantInfoMapper;
 import com.drainage.mapper.IPlacardMapper;
 import com.drainage.service.IMerchantInfoService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,9 @@ public class MerchantInfoServiceImpl implements IMerchantInfoService {
 
     @Autowired
     private IPlacardMapper placardMapper;
+
+    @Autowired
+    private IMerchantAccountMapper accountMapper;
 
 
     @Override
@@ -111,5 +117,36 @@ public class MerchantInfoServiceImpl implements IMerchantInfoService {
         queryWrapper.orderByAsc("id");
         queryWrapper.last("limit 1");
         return merchantInfoMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public int addMerchantAccount(MerchantAccount account) {
+        return accountMapper.insert(account);
+    }
+
+    @Override
+    public int updateMerchantAccount(MerchantAccount account) {
+        return accountMapper.updateById(account);
+    }
+
+    @Override
+    public MerchantAccount findMerchantAccount(int id) {
+        return accountMapper.selectById(id);
+    }
+
+    @Override
+    public int delMerchantAccount(int id) {
+        return accountMapper.deleteById(id);
+    }
+
+    @Override
+    public IPage findMerchantAccounts(String name, int pageIndex, int pageSize) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        if(StringUtils.isNotBlank(name)){
+            queryWrapper.like("name",name);
+        }
+
+        Page<MerchantAccount> page = new Page<>(pageIndex,pageSize);
+        return accountMapper.selectPage(page,queryWrapper);
     }
 }

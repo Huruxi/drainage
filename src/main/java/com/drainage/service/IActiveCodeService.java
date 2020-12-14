@@ -55,6 +55,13 @@ public interface IActiveCodeService {
     ActivationCode findActivationCode(String code);
 
     /**
+     * 获取激活码
+     * @param code
+     * @return
+     */
+    IPage findActivationCodes(String code,String typeId,String loginState,int offset, int limit);
+
+    /**
      * 获取登录激活码
      * @return
      */

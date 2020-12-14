@@ -3,6 +3,7 @@ package com.drainage.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.drainage.dto.CodeEnum;
 import com.drainage.dto.HttpResult;
+import com.drainage.entity.MerchantAccount;
 import com.drainage.entity.MerchantInfo;
 import com.drainage.entity.Placard;
 import com.drainage.service.IMerchantInfoService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -163,6 +165,92 @@ public class MerchantInfoController {
     public HttpResult<MerchantInfo> findMerchantInfo(){
         MerchantInfo merchantInfo = merchantInfoService.findMerchantInfo();
         return new HttpResult().fillData(merchantInfo);
+    }
+
+
+    @ApiOperation("添加商户账号信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", required = true, value = "名称", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "mobile", required = true, value = "号码", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "accountNumber", required = true, value = "账号", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "payType", required = true, value = "支付类型: 1 微信 2 支付宝 3 银行卡", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payStatus", required = true, value = "支付状态: 0 未支付 1 支付", dataType = "int", paramType = "query")
+    })
+    @RequestMapping(value = "/0/addMerchantAccount",method = RequestMethod.POST)
+    public HttpResult addMerchantAccount(@RequestParam String name,
+                                         @RequestParam String mobile,
+                                         @RequestParam String accountNumber,
+                                         @RequestParam int payType,
+                                         @RequestParam int payStatus){
+        MerchantAccount account = new MerchantAccount();
+        account.setMobile(mobile);
+        account.setName(name);
+        account.setAccountNumber(accountNumber);
+        account.setPayType(payType);
+        account.setPayStatus(payStatus);
+        account.setUpdateTime(new Date());
+        account.setAddTime(new Date());
+        int result = merchantInfoService.addMerchantAccount(account);
+        if(result > 0){
+            return new HttpResult().fillCode(CodeEnum.SUCCESS);
+        }
+
+        return new HttpResult().fillCode(CodeEnum.ERROR_SERVER);
+    }
+
+    @ApiOperation("更新商户账号支付状态信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", required = true, value = "id", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "payStatus", required = true, value = "支付状态: 0 未支付 1 支付", dataType = "int", paramType = "query")
+    })
+    @RequestMapping(value = "/updateMerchantAccount",method = RequestMethod.POST)
+    public HttpResult updateMerchantAccount(@RequestParam int id,
+                                            @RequestParam int payStatus){
+
+        MerchantAccount account = merchantInfoService.findMerchantAccount(id);
+        if(account != null){
+            account.setPayStatus(payStatus);
+            account.setUpdateTime(new Date());
+            int result = merchantInfoService.updateMerchantAccount(account);
+            if(result > 0){
+                return new HttpResult().fillCode(CodeEnum.SUCCESS);
+            }else{
+                return new HttpResult().fillCode(CodeEnum.ERROR_SERVER);
+            }
+        }
+
+        return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
+    }
+
+
+    @ApiOperation("获取商户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "name", required = true, value = "名称", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "pageIndex", required = true, value = "页码", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "pageSize", required = true, value = "页面数据大小", dataType = "int", paramType = "query")
+    })
+    @RequestMapping(value = "/findMerchantAccounts",method = RequestMethod.POST)
+    public HttpResult<IPage> findMerchantAccounts(@RequestParam String name,
+                                                  @RequestParam int pageIndex,
+                                                  @RequestParam int pageSize){
+
+        IPage accounts = merchantInfoService.findMerchantAccounts(name, pageIndex, pageSize);
+        return new HttpResult<>().fillData(accounts);
+    }
+
+
+
+    @ApiOperation("删除商户信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "id", required = true, value = "id", dataType = "int", paramType = "query"),
+    })
+    @RequestMapping(value = "/delMerchantAccount",method = RequestMethod.POST)
+    public HttpResult delMerchantAccount(@RequestParam int id){
+        int result = merchantInfoService.delMerchantAccount(id);
+        if(result > 0){
+            return new HttpResult<>().fillCode(CodeEnum.SUCCESS);
+        }
+        return new HttpResult<>().fillCode(CodeEnum.ERROR_PARAMETER);
     }
 
 }

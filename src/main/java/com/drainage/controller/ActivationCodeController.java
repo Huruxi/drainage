@@ -94,12 +94,19 @@ public class ActivationCodeController {
     @ApiOperation("搜索激活码")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "typeId", required = true, value = "激活码类型", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "loginState", required = true, value = "登录状态", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "offset", required = true, value = "数据偏移量", dataType = "int", paramType = "query"),
+            @ApiImplicitParam(name = "limit", required = true, value = "限制获取数据大小", dataType = "int", paramType = "query")
     })
     @RequestMapping(value = "/searchActiveCodes",method = RequestMethod.POST)
-    public HttpResult<ActivationCode> searchActiveCodes(@RequestParam String code){
-
-        ActivationCode activationCode = activeCodeService.findActivationCode(code);
-        return new HttpResult<>().fillData(activationCode);
+    public HttpResult<IPage> searchActiveCodes(@RequestParam String code,
+                                                        @RequestParam String typeId,
+                                                        @RequestParam String loginState,
+                                                        @RequestParam int offset,
+                                                        @RequestParam int limit){
+        IPage page = activeCodeService.findActivationCodes(code,typeId,loginState,offset,limit);
+        return new HttpResult<>().fillData(page);
     }
 
 

@@ -47,7 +47,6 @@ CREATE TABLE `t_activation_code_login_log` (
 );
 
 
-
 -- 返利表 rebateForm
 CREATE TABLE `t_rebate_form` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
@@ -63,7 +62,7 @@ CREATE TABLE `t_rebate_form` (
 CREATE TABLE `t_placard` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) DEFAULT NULL COMMENT '标题',
-  `content` varchar(1000) DEFAULT NULL COMMENT '公告内容',
+  `content` text DEFAULT NULL COMMENT '公告内容',
   `is_release` int default 0 COMMENT '是否发布公告',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
@@ -81,7 +80,23 @@ CREATE TABLE `t_merchant_info` (
   PRIMARY KEY (`id`)
 );
 
+-- 商家账户
+CREATE TABLE `t_merchant_account` (
+  `id` int(4) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL COMMENT '名称',
+  `mobile` varchar(255) DEFAULT NULL COMMENT '号码',
+  `account_number` varchar(255) DEFAULT NULL COMMENT '支付账号',
+  `pay_type` int(4) DEFAULT 0 COMMENT '支付类型: 1 微信 2 支付宝 3 银行卡',
+  `pay_status` int(4) DEFAULT 0 COMMENT '支付状态: 0 未支付 1 已支付',
+  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
+  `add_time` datetime DEFAULT NULL COMMENT '添加时间',
+  PRIMARY KEY (`id`)
+);
+
 
 ALTER TABLE t_activation_code_type
 ADD COLUMN money DECIMAL(9,2)
 DEFAULT NULL COMMENT '每天返利金额' AFTER update_time;
+
+
+create INDEX index_name on t_admin(`name`);

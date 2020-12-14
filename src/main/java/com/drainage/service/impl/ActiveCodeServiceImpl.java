@@ -10,6 +10,7 @@ import com.drainage.mapper.IActivationCodeLoginLogMapper;
 import com.drainage.mapper.IActivationCodeMapper;
 import com.drainage.mapper.IActivationCodeTypeMapper;
 import com.drainage.service.IActiveCodeService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -71,6 +72,24 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
         queryWrapper.eq("code",code);
         queryWrapper.last("limit 1");
         return activationCodeMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public IPage findActivationCodes(String code,String typeId,String loginState,int offset, int limit) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        if(StringUtils.isNotBlank(code)){
+            queryWrapper.eq("code",code);
+        }
+
+        if(StringUtils.isNotBlank(typeId)){
+            queryWrapper.eq("type_id",typeId);
+        }
+        if(StringUtils.isNotBlank(loginState)){
+            queryWrapper.eq("login_state",loginState);
+        }
+
+        Page<ActivationCode> page = new Page<>(offset,limit);
+        return activationCodeMapper.selectPage(page, queryWrapper);
     }
 
     @Override

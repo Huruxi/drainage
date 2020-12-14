@@ -153,6 +153,21 @@ public class RebateFormServiceImpl implements IRebateFormService {
         return rebateFormMapper.selectPage(page, queryWrapper);
     }
 
+    @Override
+    public IPage statisticsActiveCodeRebate(String code, String startTime, String endTime, int offset, int limit) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        if(StringUtils.isNotBlank(code)){
+            queryWrapper.eq("code",code);
+        }
+
+        if(StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)){
+            queryWrapper.between("add_time",startTime,endTime);
+        }
+
+        Page<RebateForm> page = new Page<>(offset,limit);
+        return rebateFormMapper.selectPage(page, queryWrapper);
+    }
+
 
     public static BigDecimal getRandomMoney(Rebate _rebate) {
         // remainSize 剩余的返利数量

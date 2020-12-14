@@ -1,6 +1,7 @@
 package com.drainage.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.drainage.entity.MerchantAccount;
 import com.drainage.entity.MerchantInfo;
 import com.drainage.entity.Placard;
 
@@ -72,4 +73,43 @@ public interface IMerchantInfoService {
      * @return
      */
     MerchantInfo findMerchantInfo();
+
+
+    /**
+     * 添加账户信息
+     * @param account
+     * @return
+     */
+    int addMerchantAccount(MerchantAccount account);
+
+    /**
+     * 更新账户信息
+     * @param account
+     * @return
+     */
+    int updateMerchantAccount(MerchantAccount account);
+
+    /**
+     * 根据ID获取
+     * @param id
+     * @return
+     */
+    MerchantAccount findMerchantAccount(int id);
+
+    /**
+     * 删除
+     * @param id
+     * @return
+     */
+    int delMerchantAccount(int id);
+
+    /**
+     * 获取商户列表
+     * @param name
+     * @param pageIndex
+     * @param pageSize
+     * @return
+     */
+    IPage findMerchantAccounts(String name,int pageIndex,int pageSize);
+
 }

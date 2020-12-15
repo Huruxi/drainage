@@ -20,6 +20,13 @@ public class WebConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         //// 拦截所有请求
-        registry.addInterceptor(LoginInterceptor()).addPathPatterns("/**").excludePathPatterns("/api/*/0/**");
+        registry.addInterceptor(LoginInterceptor())
+                .addPathPatterns("/**")
+                .excludePathPatterns("/",
+                        "/api/*/0/**",
+                        "/login",
+                        "/error",
+                        "/index.html",
+                        "/static/**");
     }
 }

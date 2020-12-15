@@ -32,7 +32,11 @@ spring:
 # 日志
 logging:
   level:
-    com.drainage: debug
+    com:
+      drainage: debug
+    org:
+      springframework:
+        web: debug
 
 # mybatis-plus
 mybatis-plus:

@@ -156,6 +156,7 @@ public class RebateFormServiceImpl implements IRebateFormService {
     @Override
     public IPage statisticsActiveCodeRebate(String code, String startTime, String endTime, int offset, int limit) {
         QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.select("code,sum(money) as money");
         if(StringUtils.isNotBlank(code)){
             queryWrapper.eq("code",code);
         }
@@ -164,6 +165,7 @@ public class RebateFormServiceImpl implements IRebateFormService {
             queryWrapper.between("add_time",startTime,endTime);
         }
 
+        queryWrapper.groupBy("code");
         Page<RebateForm> page = new Page<>(offset,limit);
         return rebateFormMapper.selectPage(page, queryWrapper);
     }

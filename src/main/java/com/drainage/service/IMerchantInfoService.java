@@ -72,7 +72,7 @@ public interface IMerchantInfoService {
      * 获取商户信息
      * @return
      */
-    MerchantInfo findMerchantInfo();
+    List<MerchantInfo> findMerchantInfo();
 
 
     /**

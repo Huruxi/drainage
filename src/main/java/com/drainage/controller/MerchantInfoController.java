@@ -11,7 +11,10 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,22 +61,15 @@ public class MerchantInfoController {
 
     @ApiOperation("更新公告")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", required = true, value = "公告ID", dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "isRelease", required = true, value = "是否发布", dataType = "boolean", paramType = "query"),
-            @ApiImplicitParam(name = "title", required = true, value = "公告标题", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "content", required = true, value = "公告内容", dataType = "String", paramType = "query")
+          @ApiImplicitParam(name = "placard", required = true, value = "公告对象", dataType = "Object", paramType = "query")
     })
     @RequestMapping(value = "/updatePlacard",method = RequestMethod.POST)
-    public HttpResult updatePlacard(@RequestParam int id,
-                                    @RequestParam boolean isRelease,
-                                    @RequestParam String title,
-                                    @RequestParam String content){
-        int releaseStatus = isRelease ? 1 : 0;
+    public HttpResult updatePlacard(@RequestBody Placard placard){
         int result = 0;
-        if(id > 0){
-            result = merchantInfoService.updatePlacard(id,title, content,releaseStatus);
+        if(placard.getId() > 0){
+            result = merchantInfoService.updatePlacard(placard.getId(),placard.getTitle(), placard.getContent(),placard.getIsRelease());
         }else{
-            result = merchantInfoService.addPlacard(title, content,releaseStatus);
+            result = merchantInfoService.addPlacard(placard.getTitle(), placard.getContent(),placard.getIsRelease());
         }
 
         if(result > 0){
@@ -139,19 +135,20 @@ public class MerchantInfoController {
 
     @ApiOperation("更新商户信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", required = true, value = "id", dataType = "int", paramType = "query"),
-            @ApiImplicitParam(name = "name", required = true, value = "信息名称", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "val", required = true, value = "值", dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "信息对象", required = true, value = "obj", dataType = "String", paramType = "query")
     })
     @RequestMapping(value = "/updateMerchantInfo",method = RequestMethod.POST)
-    public HttpResult updateMerchantInfo(@RequestParam int id,
-                                         @RequestParam String name,
-                                         @RequestParam String val){
+    public HttpResult updateMerchantInfo(@RequestBody List<MerchantInfo> merchantInfos){
+        int len = merchantInfos != null ? merchantInfos.size() : 0;
         int result = 0;
-        if(id > 0){
-            result = merchantInfoService.updateMerchantInfo(id, name, val);
-        }else{
-            result = merchantInfoService.addMerchantInfo(name, val);
+
+        for(int i = 0; i < len; i++){
+            MerchantInfo merchantInfo = merchantInfos.get(i);
+            if(merchantInfo.getId() > 0){
+                result = merchantInfoService.updateMerchantInfo(merchantInfo.getId(), merchantInfo.getName(),merchantInfo.getContent());
+            }else{
+                result = merchantInfoService.addMerchantInfo(merchantInfo.getName(),merchantInfo.getContent());
+            }
         }
 
         if(result > 0){
@@ -162,8 +159,8 @@ public class MerchantInfoController {
 
     @ApiOperation("获取商户信息")
     @RequestMapping(value = "/0/findMerchantInfo",method = RequestMethod.POST)
-    public HttpResult<MerchantInfo> findMerchantInfo(){
-        MerchantInfo merchantInfo = merchantInfoService.findMerchantInfo();
+    public HttpResult<List<MerchantInfo>> findMerchantInfo(){
+        List<MerchantInfo> merchantInfo = merchantInfoService.findMerchantInfo();
         return new HttpResult().fillData(merchantInfo);
     }
 

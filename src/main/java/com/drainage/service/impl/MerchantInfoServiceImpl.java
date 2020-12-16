@@ -112,11 +112,11 @@ public class MerchantInfoServiceImpl implements IMerchantInfoService {
     }
 
     @Override
-    public MerchantInfo findMerchantInfo() {
-        QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.orderByAsc("id");
-        queryWrapper.last("limit 1");
-        return merchantInfoMapper.selectOne(queryWrapper);
+    public List<MerchantInfo> findMerchantInfo() {
+//        QueryWrapper queryWrapper = new QueryWrapper();
+//        queryWrapper.orderByAsc("id");
+//        queryWrapper.last("limit 1");
+        return merchantInfoMapper.selectList(null);
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
@@ -179,6 +180,28 @@ public class ActivationCodeController {
         return new HttpResult().fillCode(CodeEnum.SUCCESS);
     }
 
+    @ApiOperation("检测激活码登录状态,超过分钟内未检测,则视为已下线")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+    })
+    @RequestMapping(value = "/0/detectLoginState",method = RequestMethod.POST)
+    public HttpResult detectLoginState(@RequestParam String code){
+        ActivationCode activationCode = activeCodeService.findActivationCode(code);
+        if(activationCode == null){
+            return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
+        }
+
+        if(activationCode.getLoginState() == 0){
+            return new HttpResult().fillCode(500,"激活码登录已下线");
+        }
+
+        int result = activeCodeService.updateActiveCodeLoginLogUpdateTime(code);
+        if(result > 0){
+            return new HttpResult().fillCode(CodeEnum.SUCCESS);
+        }
+
+        return new HttpResult().fillCode(CodeEnum.ERROR_SERVER);
+    }
 
 
 }

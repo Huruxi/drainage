@@ -105,4 +105,22 @@ public interface IActiveCodeService {
      * @return
      */
     IPage findDailyActiveCodeIncome(int offset, int limit);
+
+    /**
+     * 获取激活码最新登录日志
+     * @param code
+     * @return
+     */
+    ActivationCodeLoginLog findActivationCodeLoginLog(String code);
+
+    /**
+     * 更新激活码登录日志的更新时间
+     * @return
+     */
+    int updateActiveCodeLoginLogUpdateTime(String code);
+
+    /**
+     * 检测激活码是否离线
+     */
+    void detectActiveCodeOffline();
 }

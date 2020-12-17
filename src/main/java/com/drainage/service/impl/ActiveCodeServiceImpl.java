@@ -154,4 +154,39 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
         Page<ActivationCode> page = new Page<>(offset,limit);
         return activationCodeMapper.selectPage(page, queryWrapper);
     }
+
+    @Override
+    public ActivationCodeLoginLog findActivationCodeLoginLog(String code) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("code",code);
+        queryWrapper.orderByDesc("id");
+        queryWrapper.last("limit 1");
+        return codeLoginLogMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public int updateActiveCodeLoginLogUpdateTime(String code) {
+        ActivationCodeLoginLog loginLog = findActivationCodeLoginLog(code);
+        if(loginLog != null){
+            loginLog.setUpdateTime(new Date());
+            return codeLoginLogMapper.updateById(loginLog);
+        }
+
+        return 0;
+    }
+
+    @Override
+    public void detectActiveCodeOffline() {
+        List<ActivationCode> activationCode = this.findLoginActivationCode();
+        long currentTime = System.currentTimeMillis();
+
+        for (ActivationCode code : activationCode) {
+            ActivationCodeLoginLog loginLog = this.findActivationCodeLoginLog(code.getCode());
+            long time = currentTime - loginLog.getUpdateTime().getTime();
+            if(time > 58000){
+                this.updateActiveCodeOnlineTime(code.getCode());
+            }
+        }
+    }
+
 }

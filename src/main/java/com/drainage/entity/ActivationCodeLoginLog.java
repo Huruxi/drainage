@@ -18,7 +18,7 @@ public class ActivationCodeLoginLog implements java.io.Serializable {
      */
     private String code;
     /**
-     * 在线时间以秒为单位
+     * 在线时间以分钟为单位
      */
     private int onlineTime;
 

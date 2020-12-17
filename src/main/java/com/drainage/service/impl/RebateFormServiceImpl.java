@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -97,45 +98,54 @@ public class RebateFormServiceImpl implements IRebateFormService {
             return;
         }
 
+        long currentTime = System.currentTimeMillis();
+
         for (ActivationCode activationCode : activationCodes) {
-            for (ActivationCodeType codeType : activationCodeTypes) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(activationCode.getAddTime().getTime());
+            calendar.add(Calendar.MONTH, 1);
 
-                if(activationCode.getTypeId() == codeType.getId()){
-                    List<RebateForm> toDayCodeRebateForm = findToDayCodeRebateForm(activationCode.getCode());
-                    Rebate rebate = new Rebate();
-                    BigDecimal rebateMoney = BigDecimal.ZERO;
+            if (currentTime < calendar.getTimeInMillis()) {
 
-                    if(toDayCodeRebateForm != null && toDayCodeRebateForm.size() > 0){//已有返利的情况
-                        if(toDayCodeRebateForm.size() >= duration) {
-                            //激活码退出登录
-                            activationCode.setLoginState(0);
-                            activationCode.setUpdateTime(new Date());
-                            activeCodeService.updateActiveCode(activationCode);
-                            activeCodeService.updateActiveCodeOnlineTime(activationCode.getCode());
-                            break;
+                for (ActivationCodeType codeType : activationCodeTypes) {
+
+                    if (activationCode.getTypeId() == codeType.getId()) {
+                        List<RebateForm> toDayCodeRebateForm = findToDayCodeRebateForm(activationCode.getCode());
+                        Rebate rebate = new Rebate();
+                        BigDecimal rebateMoney = BigDecimal.ZERO;
+
+                        if (toDayCodeRebateForm != null && toDayCodeRebateForm.size() > 0) {//已有返利的情况
+                            if (toDayCodeRebateForm.size() >= duration) {
+                                //激活码退出登录
+                                activationCode.setLoginState(0);
+                                activationCode.setUpdateTime(new Date());
+                                activeCodeService.updateActiveCode(activationCode);
+                                activeCodeService.updateActiveCodeOnlineTime(activationCode.getCode());
+                                break;
+                            }
+
+                            BigDecimal amountReturned = toDayCodeRebateForm.stream().map(rebateForm -> rebateForm.getMoney()).reduce(BigDecimal.ZERO, BigDecimal::add);
+                            BigDecimal balance = codeType.getMoney().subtract(amountReturned);
+                            rebate.remainMoney = balance;
+                            rebate.remainSize = (duration - toDayCodeRebateForm.size());
+                            rebateMoney = getRandomMoney(rebate);
+
+                        } else {//今日首次返利
+                            rebate.remainMoney = codeType.getMoney();
+                            rebate.remainSize = duration;
+                            rebateMoney = getRandomMoney(rebate);
                         }
 
-                        BigDecimal amountReturned = toDayCodeRebateForm.stream().map(rebateForm -> rebateForm.getMoney()).reduce(BigDecimal.ZERO, BigDecimal::add);
-                        BigDecimal balance = codeType.getMoney().subtract(amountReturned);
-                        rebate.remainMoney = balance;
-                        rebate.remainSize = (duration - toDayCodeRebateForm.size());
-                        rebateMoney = getRandomMoney(rebate);
-
-                    }else{//今日首次返利
-                        rebate.remainMoney = codeType.getMoney();
-                        rebate.remainSize = duration;
-                        rebateMoney = getRandomMoney(rebate);
+                        RebateForm rebateForm = new RebateForm();
+                        rebateForm.setCode(activationCode.getCode());
+                        rebateForm.setMoney(rebateMoney);
+                        rebateForm.setUpdateTime(new Date());
+                        rebateForm.setAddTime(new Date());
+                        addRebateForm(rebateForm);
+                        break;
                     }
 
-                    RebateForm rebateForm = new RebateForm();
-                    rebateForm.setCode(activationCode.getCode());
-                    rebateForm.setMoney(rebateMoney);
-                    rebateForm.setUpdateTime(new Date());
-                    rebateForm.setAddTime(new Date());
-                    addRebateForm(rebateForm);
-                    break;
                 }
-
             }
         }
     }
@@ -202,5 +212,4 @@ public class RebateFormServiceImpl implements IRebateFormService {
         //剩余的钱
         BigDecimal remainMoney;
     }
-
 }

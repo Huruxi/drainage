@@ -1,9 +1,7 @@
 package com.drainage.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.drainage.dto.CodeEnum;
 import com.drainage.dto.HttpResult;
-import com.drainage.entity.ActivationCode;
 import com.drainage.entity.RebateForm;
 import com.drainage.service.IActiveCodeService;
 import com.drainage.service.IRebateFormService;
@@ -11,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -52,12 +51,12 @@ public class RebateFormController {
                                                          @RequestParam int pageIndex,
                                                          @RequestParam int pageSize){
 
-        ActivationCode activationCode = activeCodeService.findActivationCode(code);
-        if(activationCode == null){
-            return new HttpResult<>().fillCode(CodeEnum.ERROR_PARAMETER);
+        if(StringUtils.isNotBlank(code)){
+            IPage rebateForms = rebateFormService.findActiveCodeRebateForm(code,sortType, pageIndex, pageSize);
+            return new HttpResult<>().fillData(rebateForms);
         }
 
-        IPage rebateForms = rebateFormService.findActiveCodeRebateForm(code,sortType, pageIndex, pageSize);
+        IPage rebateForms = rebateFormService.findRebateForm(sortType, pageIndex, pageSize);
         return new HttpResult<>().fillData(rebateForms);
     }
 
@@ -69,8 +68,8 @@ public class RebateFormController {
     })
     @RequestMapping(value = "/findRebateForm",method = RequestMethod.POST)
     public HttpResult<IPage> findRebateForm(@RequestParam int sortType,
-                                                       @RequestParam int pageIndex,
-                                                       @RequestParam int pageSize){
+                                            @RequestParam int pageIndex,
+                                            @RequestParam int pageSize){
 
         IPage rebateForms = rebateFormService.findRebateForm(sortType, pageIndex, pageSize);
         return new HttpResult<>().fillData(rebateForms);

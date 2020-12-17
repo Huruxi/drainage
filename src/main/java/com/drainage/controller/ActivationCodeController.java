@@ -141,6 +141,10 @@ public class ActivationCodeController {
             }
         }
 
+        if(activationCode.getLoginState() == 1){
+            return new HttpResult().fillCode(500,"当前激活码已登录,不能重复登录");
+        }
+
         activationCode.setStatus(1);
         activationCode.setLoginState(1);
         activationCode.setUpdateTime(new Date());

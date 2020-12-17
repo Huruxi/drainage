@@ -184,6 +184,9 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
             ActivationCodeLoginLog loginLog = this.findActivationCodeLoginLog(code.getCode());
             long time = currentTime - loginLog.getUpdateTime().getTime();
             if(time > 58000){
+                code.setLoginState(0);
+                code.setUpdateTime(new Date());
+                this.updateActiveCode(code);
                 this.updateActiveCodeOnlineTime(code.getCode());
             }
         }

@@ -20,6 +20,16 @@ public class ActivationCode implements java.io.Serializable {
     private int typeId;
     private int loginState;
 
+    /**
+     * 当日在线时长，秒为单位
+     */
+    private long onlineTimeToday;
+
+    /**
+     * 总计在线时长，秒为单位
+     */
+    private long onlineTimeTotal;
+
     private Date updateTime;
     private Date addTime;
 

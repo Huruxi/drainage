@@ -17,6 +17,8 @@ CREATE TABLE `t_activation_code` (
   `status` int(4) DEFAULT 0 COMMENT '是否激活, 0 未激活，1 激活',
   `type_id` int(4) default 0 comment '激活码类型ID',
   `login_state` int(4) DEFAULT 0 COMMENT '激活登录状态',
+  `online_time_today` bigint(19) DEFAULT 0 COMMENT '今日在线时长秒为单位',
+  `online_time_total` bigint(19) DEFAULT 0 COMMENT '总计在线时长秒为单位',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `add_time` datetime DEFAULT NULL COMMENT '添加时间',
   PRIMARY KEY (`id`)
@@ -94,9 +96,9 @@ CREATE TABLE `t_merchant_account` (
 );
 
 
-ALTER TABLE t_activation_code_type
-ADD COLUMN money DECIMAL(9,2)
-DEFAULT NULL COMMENT '每天返利金额' AFTER update_time;
+ALTER TABLE t_activation_code
+ADD COLUMN
+`online_time_total` bigint(19) DEFAULT 0 COMMENT '总计在线时长秒为单位' AFTER login_state;
 
 
 create INDEX index_name on t_admin(`name`);

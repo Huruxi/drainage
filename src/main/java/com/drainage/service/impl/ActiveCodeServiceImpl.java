@@ -14,6 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
@@ -184,12 +189,38 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
             ActivationCodeLoginLog loginLog = this.findActivationCodeLoginLog(code.getCode());
             long time = currentTime - loginLog.getUpdateTime().getTime();
             if(time > 58000){
-                code.setLoginState(0);
-                code.setUpdateTime(new Date());
-                this.updateActiveCode(code);
-                this.updateActiveCodeOnlineTime(code.getCode());
+                this.activeCodeQuitLogin(code);
             }
         }
+    }
+
+    @Override
+    public void activeCodeQuitLogin(ActivationCode activationCode) {
+        Instant instant = activationCode.getUpdateTime().toInstant();
+        ZoneId zoneId = ZoneId.systemDefault();
+        LocalDate localDate = instant.atZone(zoneId).toLocalDate();
+
+        if(localDate.equals(LocalDate.now())){
+            //当天的情况
+            long currentOnlineTime = System.currentTimeMillis() - activationCode.getUpdateTime().getTime();
+            activationCode.setOnlineTimeToday(activationCode.getOnlineTimeToday() + (currentOnlineTime/1000));
+            activationCode.setOnlineTimeTotal(activationCode.getOnlineTimeTotal() + activationCode.getOnlineTimeToday());
+        }else{
+            //隔天的情况
+            LocalTime time = LocalTime.now();
+            long second = time.getHour() * 3600;
+            second += time.getMinute() * 60;
+            second += time.getSecond();
+
+            activationCode.setOnlineTimeToday(second);
+            long currentOnlineTime = System.currentTimeMillis() - activationCode.getUpdateTime().getTime();
+            activationCode.setOnlineTimeTotal(activationCode.getOnlineTimeTotal() + (currentOnlineTime/1000));
+        }
+
+        activationCode.setLoginState(0);
+        activationCode.setUpdateTime(new Date());
+        this.updateActiveCode(activationCode);
+        this.updateActiveCodeOnlineTime(activationCode.getCode());
     }
 
 }

@@ -123,4 +123,10 @@ public interface IActiveCodeService {
      * 检测激活码是否离线
      */
     void detectActiveCodeOffline();
+
+    /**
+     * 激活码退出登录
+     * @param activationCode
+     */
+    void activeCodeQuitLogin(ActivationCode activationCode);
 }

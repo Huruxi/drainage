@@ -117,10 +117,10 @@ public class RebateFormServiceImpl implements IRebateFormService {
                         if (toDayCodeRebateForm != null && toDayCodeRebateForm.size() > 0) {//已有返利的情况
                             if (toDayCodeRebateForm.size() >= duration) {
                                 //激活码退出登录
-                                activationCode.setLoginState(0);
-                                activationCode.setUpdateTime(new Date());
-                                activeCodeService.updateActiveCode(activationCode);
-                                activeCodeService.updateActiveCodeOnlineTime(activationCode.getCode());
+//                                activationCode.setLoginState(0);
+//                                activationCode.setUpdateTime(new Date());
+//                                activeCodeService.updateActiveCode(activationCode);
+//                                activeCodeService.updateActiveCodeOnlineTime(activationCode.getCode());
                                 break;
                             }
 

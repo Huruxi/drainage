@@ -22,6 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -146,6 +150,18 @@ public class ActivationCodeController {
             return new HttpResult().fillCode(500,"当前激活码已登录,不能重复登录");
         }
 
+        //计算当日在线时长
+        ActivationCodeLoginLog loginLog = activeCodeService.findActivationCodeLoginLog(code);
+        if(loginLog != null){
+            Instant instant = loginLog.getAddTime().toInstant();
+            ZoneId zoneId = ZoneId.systemDefault();
+            LocalDate localDate = instant.atZone(zoneId).toLocalDate();
+
+            if(!localDate.equals(LocalDate.now())){
+                activationCode.setOnlineTimeToday(0);
+            }
+        }
+
         activationCode.setStatus(1);
         activationCode.setLoginState(1);
         activationCode.setUpdateTime(new Date());
@@ -157,9 +173,23 @@ public class ActivationCodeController {
             codeLoginLog.setUpdateTime(new Date());
             codeLoginLog.setAddTime(new Date());
             activeCodeService.addActivationCodeLoginLog(codeLoginLog);
-            return new HttpResult().fillCode(CodeEnum.SUCCESS);
+            return new HttpResult().fillData(activationCode);
         }
         return new HttpResult().fillCode(CodeEnum.ERROR_SERVER);
+    }
+
+    @ApiOperation("获取单个激活码信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+    })
+    @RequestMapping(value = "/0/findActiveCode",method = RequestMethod.POST)
+    public HttpResult findActiveCode(@RequestParam String code){
+        ActivationCode activationCode = activeCodeService.findActivationCode(code);
+        if(activationCode == null){
+            return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
+        }
+
+        return new HttpResult().fillData(activationCode);
     }
 
     @ApiOperation("激活码退出登录")
@@ -173,10 +203,7 @@ public class ActivationCodeController {
             return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
         }
 
-        activationCode.setLoginState(0);
-        activationCode.setUpdateTime(new Date());
-        activeCodeService.updateActiveCode(activationCode);
-        activeCodeService.updateActiveCodeOnlineTime(code);
+        activeCodeService.activeCodeQuitLogin(activationCode);
         return new HttpResult().fillCode(CodeEnum.SUCCESS);
     }
 

@@ -36,6 +36,9 @@ public class RebateFormServiceImpl implements IRebateFormService {
     private IActiveCodeService activeCodeService;
 
     @Autowired
+    private IActivationCodeMapper activationCodeMapper;
+
+    @Autowired
     private IActivationCodeTypeMapper codeTypeMapper;
 
 //    @Value("login.duration")
@@ -90,7 +93,9 @@ public class RebateFormServiceImpl implements IRebateFormService {
 
     @Override
     public void loginRebate() {
-        List<ActivationCode> activationCodes = activeCodeService.findLoginActivationCode();
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("login_state",2);
+        List<ActivationCode> activationCodes = activationCodeMapper.selectList(queryWrapper);
         List<ActivationCodeType> activationCodeTypes = codeTypeMapper.selectList(null);
 
         if(activationCodes == null || activationCodes.size() == 0
@@ -99,7 +104,6 @@ public class RebateFormServiceImpl implements IRebateFormService {
         }
 
         long currentTime = System.currentTimeMillis();
-
         for (ActivationCode activationCode : activationCodes) {
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(activationCode.getAddTime().getTime());
@@ -136,9 +140,12 @@ public class RebateFormServiceImpl implements IRebateFormService {
                             rebateMoney = getRandomMoney(rebate);
                         }
 
+                        RebateForm codeBalance = findActiveCodeBalance(activationCode.getCode(), null, null);
                         RebateForm rebateForm = new RebateForm();
                         rebateForm.setCode(activationCode.getCode());
                         rebateForm.setMoney(rebateMoney);
+                        rebateForm.setType(0);
+                        rebateForm.setBalance(codeBalance != null ? codeBalance.getBalance().add(rebateMoney) : rebateMoney);
                         rebateForm.setUpdateTime(new Date());
                         rebateForm.setAddTime(new Date());
                         addRebateForm(rebateForm);
@@ -178,6 +185,22 @@ public class RebateFormServiceImpl implements IRebateFormService {
         queryWrapper.groupBy("code");
         Page<RebateForm> page = new Page<>(offset,limit);
         return rebateFormMapper.selectPage(page, queryWrapper);
+    }
+
+    @Override
+    public RebateForm findActiveCodeBalance(String code, String startTime, String endTime) {
+        QueryWrapper queryWrapper = new QueryWrapper();
+        queryWrapper.eq("code",code);
+        if(StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)){
+            queryWrapper.select("code,sum(money) as money");
+            queryWrapper.eq("type",0);
+            queryWrapper.between("add_time",startTime,endTime);
+        }else{
+            queryWrapper.orderByDesc("id");
+            queryWrapper.last("limit 1");
+        }
+
+        return rebateFormMapper.selectOne(queryWrapper);
     }
 
 

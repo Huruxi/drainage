@@ -57,4 +57,13 @@ public interface IRebateFormService {
      * @return
      */
     IPage statisticsActiveCodeRebate(String code,String startTime,String endTime,int offset, int limit);
+
+    /**
+     * 获取激活码返利余额
+     * @param code
+     * @param startTime
+     * @param endTime
+     * @return
+     */
+    RebateForm findActiveCodeBalance(String code,String startTime,String endTime);
 }

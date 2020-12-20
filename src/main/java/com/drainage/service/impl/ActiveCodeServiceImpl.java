@@ -100,7 +100,7 @@ public class ActiveCodeServiceImpl implements IActiveCodeService {
     @Override
     public List<ActivationCode> findLoginActivationCode() {
         QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("login_state",1);
+        queryWrapper.ne("login_state",0);
         return activationCodeMapper.selectList(queryWrapper);
     }
 

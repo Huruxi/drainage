@@ -231,4 +231,26 @@ public class ActivationCodeController {
     }
 
 
+    @ApiOperation("更新返利收益状态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "state", required = true, value = "状态: 0 暂停收益 1 收益中", dataType = "int", paramType = "query"),
+    })
+    @RequestMapping(value = "/updateActiveCodeState",method = RequestMethod.POST)
+    public HttpResult updateActiveCodeState(@RequestParam String code,
+                                            @RequestParam int state){
+        ActivationCode activationCode = activeCodeService.findActivationCode(code);
+        if(activationCode == null){
+            return new HttpResult().fillCode(CodeEnum.ERROR_PARAMETER);
+        }
+
+        if(activationCode.getLoginState() == 0){
+            return new HttpResult().fillCode(500,"请先登录");
+        }
+
+        activationCode.setLoginState(state == 1 ? 2 : 3);
+        activeCodeService.updateActiveCode(activationCode);
+        return new HttpResult().fillCode(CodeEnum.SUCCESS);
+    }
+
 }

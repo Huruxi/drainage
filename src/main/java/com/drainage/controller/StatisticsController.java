@@ -2,6 +2,7 @@ package com.drainage.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.drainage.dto.HttpResult;
+import com.drainage.entity.RebateForm;
 import com.drainage.service.IActiveCodeService;
 import com.drainage.service.IRebateFormService;
 import io.swagger.annotations.Api;
@@ -64,7 +65,7 @@ public class StatisticsController {
     }
 
 
-    @ApiOperation("统计激活码返利")
+    @ApiOperation("统计激活码总返利")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "startTime", required = true, value = "开始时间", dataType = "String", paramType = "query"),
@@ -80,5 +81,19 @@ public class StatisticsController {
                                                         @RequestParam int pageSize){
         IPage page = rebateFormService.statisticsActiveCodeRebate(code, startTime, endTime, pageIndex, pageSize);
         return new HttpResult().fillData(page);
+    }
+
+    @ApiOperation("获取激活码总余额,如果传入时间，则获取这段时间内的总收益")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "startTime", required = false, value = "开始时间", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "endTime", required = false, value = "结束时间", dataType = "String", paramType = "query")
+    })
+    @RequestMapping(value = "/findActiveCodeBalance",method = RequestMethod.POST)
+    public HttpResult<RebateForm> findActiveCodeBalance(@RequestParam String code,
+                                                        @RequestParam String startTime,
+                                                        @RequestParam String endTime){
+        RebateForm balance = rebateFormService.findActiveCodeBalance(code, startTime, endTime);
+        return new HttpResult().fillData(balance);
     }
 }

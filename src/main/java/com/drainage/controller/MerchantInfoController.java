@@ -6,7 +6,9 @@ import com.drainage.dto.HttpResult;
 import com.drainage.entity.MerchantAccount;
 import com.drainage.entity.MerchantInfo;
 import com.drainage.entity.Placard;
+import com.drainage.entity.RebateForm;
 import com.drainage.service.IMerchantInfoService;
+import com.drainage.service.IRebateFormService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -37,6 +40,8 @@ public class MerchantInfoController {
     @Autowired
     private IMerchantInfoService merchantInfoService;
 
+    @Autowired
+    private IRebateFormService rebateFormService;
 
     @ApiOperation("添加公告")
     @ApiImplicitParams({
@@ -165,6 +170,8 @@ public class MerchantInfoController {
 
     @ApiOperation("添加商户账号信息")
     @ApiImplicitParams({
+            @ApiImplicitParam(name = "code", required = true, value = "激活码", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "money", required = true, value = "提现金额", dataType = "BigDecimal", paramType = "query"),
             @ApiImplicitParam(name = "name", required = true, value = "名称", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "mobile", required = true, value = "号码", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "accountNumber", required = true, value = "账号", dataType = "String", paramType = "query"),
@@ -172,21 +179,43 @@ public class MerchantInfoController {
             @ApiImplicitParam(name = "payStatus", required = true, value = "支付状态: 0 未支付 1 支付", dataType = "int", paramType = "query")
     })
     @RequestMapping(value = "/0/addMerchantAccount",method = RequestMethod.POST)
-    public HttpResult addMerchantAccount(@RequestParam String name,
+    public HttpResult addMerchantAccount(@RequestParam String code,
+                                         @RequestParam BigDecimal money,
+                                         @RequestParam String name,
                                          @RequestParam String mobile,
                                          @RequestParam String accountNumber,
                                          @RequestParam int payType,
                                          @RequestParam int payStatus){
+
+        if(money.compareTo(BigDecimal.ZERO) < 1){
+            return new HttpResult().fillCode(500,"请输入正确的提现金额");
+        }
+
+        RebateForm codeBalance = rebateFormService.findActiveCodeBalance(code, null, null);
+        if(codeBalance == null || codeBalance.getBalance().compareTo(money) == -1){
+            return new HttpResult().fillCode(500,"没有金额可提现");
+        }
+
         MerchantAccount account = new MerchantAccount();
+        account.setCode(code);
         account.setMobile(mobile);
         account.setName(name);
         account.setAccountNumber(accountNumber);
         account.setPayType(payType);
         account.setPayStatus(payStatus);
+        account.setMoney(money);
         account.setUpdateTime(new Date());
         account.setAddTime(new Date());
         int result = merchantInfoService.addMerchantAccount(account);
         if(result > 0){
+            RebateForm rebateForm = new RebateForm();
+            rebateForm.setCode(code);
+            rebateForm.setMoney(money);
+            rebateForm.setType(1);
+            rebateForm.setBalance(codeBalance.getBalance().subtract(money));
+            rebateForm.setUpdateTime(new Date());
+            rebateForm.setAddTime(new Date());
+            rebateFormService.addRebateForm(rebateForm);
             return new HttpResult().fillCode(CodeEnum.SUCCESS);
         }
 

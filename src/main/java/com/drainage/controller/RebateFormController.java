@@ -74,5 +74,4 @@ public class RebateFormController {
         IPage rebateForms = rebateFormService.findRebateForm(sortType, pageIndex, pageSize);
         return new HttpResult<>().fillData(rebateForms);
     }
-
 }

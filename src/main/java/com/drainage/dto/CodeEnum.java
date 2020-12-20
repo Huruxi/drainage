@@ -1,5 +1,7 @@
 package com.drainage.dto;
 
+import java.math.BigDecimal;
+
 /**
  * @author hrd <br/>
  * @date 2020/12/1
@@ -35,4 +37,5 @@ public enum CodeEnum {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }

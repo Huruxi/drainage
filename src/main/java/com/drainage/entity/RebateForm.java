@@ -17,7 +17,9 @@ public class RebateForm implements java.io.Serializable{
 
     private String code;
     private BigDecimal money;
+    private BigDecimal balance;
 
+    private int type;
     private Date updateTime;
     private Date addTime;
 }

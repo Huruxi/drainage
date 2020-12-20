@@ -9,18 +9,26 @@ import com.drainage.entity.Placard;
 import com.drainage.entity.RebateForm;
 import com.drainage.service.IMerchantInfoService;
 import com.drainage.service.IRebateFormService;
+import com.drainage.utils.VerifyUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -175,6 +183,7 @@ public class MerchantInfoController {
             @ApiImplicitParam(name = "name", required = true, value = "名称", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "mobile", required = true, value = "号码", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "accountNumber", required = true, value = "账号", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "vCode", required = true, value = "验证码", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "payType", required = true, value = "支付类型: 1 微信 2 支付宝 3 银行卡", dataType = "int", paramType = "query"),
             @ApiImplicitParam(name = "payStatus", required = true, value = "支付状态: 0 未支付 1 支付", dataType = "int", paramType = "query")
     })
@@ -184,6 +193,7 @@ public class MerchantInfoController {
                                          @RequestParam String name,
                                          @RequestParam String mobile,
                                          @RequestParam String accountNumber,
+                                         @RequestParam String vCode,
                                          @RequestParam int payType,
                                          @RequestParam int payStatus){
 
@@ -194,6 +204,15 @@ public class MerchantInfoController {
         RebateForm codeBalance = rebateFormService.findActiveCodeBalance(code, null, null);
         if(codeBalance == null || codeBalance.getBalance().compareTo(money) == -1){
             return new HttpResult().fillCode(500,"没有金额可提现");
+        }
+
+        HttpSession session = request.getSession();
+        String id = session.getId();
+        // 将session中的取出对应session id生成的验证码
+        String serverCode = (String) session.getAttribute("SESSION_VERIFY_CODE_" + id);
+        // 校验验证码
+        if (null == serverCode || null == vCode || !serverCode.toUpperCase().equals(vCode.toUpperCase())) {
+            return new HttpResult().fillCode(500,"验证码错误!");
         }
 
         MerchantAccount account = new MerchantAccount();
@@ -276,5 +295,6 @@ public class MerchantInfoController {
         }
         return new HttpResult<>().fillCode(CodeEnum.ERROR_PARAMETER);
     }
+
 
 }
